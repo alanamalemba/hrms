@@ -16,25 +16,25 @@ data class User(
     val id: Long? = null,
 
     @Column(name = "first_name")
-    val firstName: String,
+    var firstName: String,
 
     @Column(name = "last_name")
-    val lastName: String,
+    var lastName: String,
 
     @Column(name = "other_names")
-    val otherNames: String?,
+    var otherNames: String?,
 
     @Column(unique = true)
-    val email: String,
+    var email: String,
 
     @Column(name = "is_verified")
-    val isVerified: Boolean? = false,
+    var isVerified: Boolean? = false,
 
     @Column(name = "phone_number")
-    val phoneNumber: String?,
+    var phoneNumber: String?,
 
     @Column(name = "hashed_password")
-    val hashedPassword: String,
+    var hashedPassword: String,
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -42,5 +42,5 @@ data class User(
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    val updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
 )

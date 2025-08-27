@@ -1,6 +1,7 @@
 package com.suluhulabs.hrms.service
 
 import com.suluhulabs.hrms.dto.SignUpRequestBody
+import com.suluhulabs.hrms.dto.VerifyEmailRequestBody
 import com.suluhulabs.hrms.model.User
 import com.suluhulabs.hrms.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -16,10 +17,10 @@ class AuthService(
     val passwordEncoder: PasswordEncoder,
     val emailService: EmailService,
     val jwtService: JwtService,
-    @param:Value("\${app.server.url}") val serverUrl: String
+    @param:Value("\${app.client.url}") val clientUrl: String
 ) {
 
-    private val emailVerificationUrl = "$serverUrl/auth/verify-email"
+    private val emailVerificationUrl = "$clientUrl/verify-email"
 
 
     @Transactional
@@ -75,6 +76,26 @@ class AuthService(
 
         return "User of email ${signUpRequestBody.email} created successfully. Follow the verification link sent to the provided email to verify your identity"
 
+
+    }
+
+    fun verifyEmail(verifyEmailRequestBody: VerifyEmailRequestBody): String {
+        val isTokenValid =
+            jwtService.checkIsTokenValid(verifyEmailRequestBody.verificationToken, JwtService.TokenType.VERIFICATION)
+
+        if (!isTokenValid) throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid auth token")
+
+        val userId =
+            jwtService.extractUserId(verifyEmailRequestBody.verificationToken, JwtService.TokenType.VERIFICATION)
+
+        val targetUser = userRepository.findById(userId)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist") }
+
+        targetUser.isVerified = true
+
+        userRepository.save(targetUser)
+
+        return "User of email ${targetUser.email} verified successfully"
 
     }
 
