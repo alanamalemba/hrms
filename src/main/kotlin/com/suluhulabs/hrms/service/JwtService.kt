@@ -1,59 +1,77 @@
+package com.suluhulabs.hrms.service
+
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.util.Date
-import javax.crypto.SecretKey
+import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @Service
 class JwtService(
-    @param:Value("\${app.jwt.access-token-secret}") private val accessTokenSecret: String,
-    @param:Value("\${app.jwt.refresh-token-secret}") private val refreshTokenSecret: String
+    @param:Value("\${app.jwt.secret}") private val jwtSecret: String,
 ) {
-
     companion object {
         private const val ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000L // 15 minutes
         private const val REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000L // 7 days
-
+        private const val VERIFICATION_TOKEN_EXPIRATION = 5 * 60 * 1000L// 5 minutes
+        private const val CLAIM_TYPE = "type"
     }
 
-    enum class TokenType { ACCESS, REFRESH }
+    enum class TokenType { ACCESS, REFRESH, VERIFICATION }
 
-    private fun getKey(tokenType: TokenType): SecretKey =
-        Keys.hmacShaKeyFor(
-            if (tokenType == TokenType.ACCESS) accessTokenSecret.toByteArray()
-            else refreshTokenSecret.toByteArray()
-        )
+    private val secretKey = Keys.hmacShaKeyFor(jwtSecret.toByteArray())
+
+    private fun getExpiration(tokenType: TokenType) = when (tokenType) {
+        TokenType.ACCESS -> ACCESS_TOKEN_EXPIRATION
+        TokenType.REFRESH -> REFRESH_TOKEN_EXPIRATION
+        TokenType.VERIFICATION -> VERIFICATION_TOKEN_EXPIRATION
+    }
+
+    private fun parseClaims(token: String) =
+        try {
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).payload
+        } catch (e: ExpiredJwtException) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expired")
+        } catch (e: JwtException) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token")
+        }
+
 
     fun generateToken(userId: Long, tokenType: TokenType): String {
-        val expiration = if (tokenType == TokenType.ACCESS) ACCESS_TOKEN_EXPIRATION else REFRESH_TOKEN_EXPIRATION
         val now = Date()
-        val expiryDate = Date(now.time + expiration)
+        val expiryDate = Date(now.time + getExpiration(tokenType))
 
         return Jwts.builder()
             .subject(userId.toString())
             .issuedAt(now)
             .expiration(expiryDate)
-            .signWith(getKey(tokenType))
+            .claim(CLAIM_TYPE, tokenType.name)
+            .signWith(secretKey)
             .compact()
     }
 
     fun checkIsTokenValid(token: String, tokenType: TokenType): Boolean {
-        return try {
-            Jwts.parser()
-                .verifyWith(getKey(tokenType))
-                .build()
-                .parseSignedClaims(token)
-            true
+        try {
+            val claims = parseClaims(token)
+
+            return claims[CLAIM_TYPE] == tokenType.name
+
         } catch (e: Exception) {
-            false
+            return false
         }
     }
 
-    fun extractUserId(token: String, tokenType: TokenType): String {
-        return Jwts.parser()
-            .verifyWith(getKey(tokenType))
-            .build()
-            .parseSignedClaims(token).payload.subject
+    fun extractUserId(token: String, tokenType: TokenType): Long {
+        val claims = parseClaims(token)
+
+        if (claims[CLAIM_TYPE] != tokenType.name) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token")
+        }
+
+        return claims.subject.toLong()
     }
 }

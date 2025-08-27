@@ -7,19 +7,20 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.server.ResponseStatusException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
-    @ExceptionHandler(ConflictException::class)
-    fun handleConflictException(ex: ConflictException): ResponseEntity<ResponseBody<Nothing>?> {
+    @ExceptionHandler(ResponseStatusException::class)
+    fun handleResponseStatus(ex: ResponseStatusException): ResponseEntity<ResponseBody<Nothing>> {
+        logger.error(ex.message, ex)
 
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(ResponseBody(success = false, message = ex.message ?: "Conflict occurred"))
-
-
+        return ResponseEntity
+            .status(ex.statusCode)
+            .body(ResponseBody(success = false, message = ex.reason ?: "Request failed"))
     }
 
     @ExceptionHandler(Exception::class)
