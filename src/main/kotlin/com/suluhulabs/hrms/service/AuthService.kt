@@ -16,8 +16,11 @@ class AuthService(
     val passwordEncoder: PasswordEncoder,
     val emailService: EmailService,
     val jwtService: JwtService,
-    @param:Value("\${app.server-url}") val serverUrl: String
+    @param:Value("\${app.server.url}") val serverUrl: String
 ) {
+
+    private val emailVerificationUrl = "$serverUrl/auth/verify-email"
+
 
     @Transactional
     fun signUp(signUpRequestBody: SignUpRequestBody): String {
@@ -53,7 +56,7 @@ class AuthService(
                   <body>
                     <p>Hi ${signUpRequestBody.firstName},</p>
                     <p>Thank you for signing up! Please verify your email address by clicking the link below:</p>
-                    <p><a href="$serverUrl?verificationToken=$verificationToken">Verify My Email</a></p>
+                    <p><a href="$emailVerificationUrl?verificationToken=$verificationToken">Verify My Email</a></p>
                     <p>If you did not create an account, you can ignore this email.</p>
                     <p>Best regards,<br/>The HRMS Team</p>
                   </body>
