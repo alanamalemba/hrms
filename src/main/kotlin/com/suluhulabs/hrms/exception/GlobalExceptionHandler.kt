@@ -25,10 +25,10 @@ class GlobalExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun handleUnhandledException(ex: Exception): ResponseEntity<ResponseBody<Nothing>?> {
 
-        logger.error("Error", ex)
+        logger.error(ex.message, ex)
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ResponseBody(success = false, message = ex.message ?: "Internal server error"))
+            .body(ResponseBody(success = false, message = "Internal server error"))
     }
 
 }
