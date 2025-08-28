@@ -15,13 +15,13 @@ class JwtService(
     @param:Value("\${app.jwt.secret}") private val jwtSecret: String,
 ) {
     companion object {
-        private const val ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000L // 15 minutes
+         const val ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000L // 15 minutes
         private const val REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000L // 7 days
         private const val VERIFICATION_TOKEN_EXPIRATION = 5 * 60 * 1000L// 5 minutes
         private const val CLAIM_TYPE = "type"
     }
 
-    enum class TokenType { ACCESS, REFRESH, VERIFICATION }
+    enum class TokenType(val value: String) { ACCESS("accessToken"), REFRESH("refreshToken"), VERIFICATION("verificationToken") }
 
     private val secretKey = Keys.hmacShaKeyFor(jwtSecret.toByteArray())
 

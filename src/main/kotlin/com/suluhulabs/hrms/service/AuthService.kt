@@ -1,5 +1,6 @@
 package com.suluhulabs.hrms.service
 
+import com.suluhulabs.hrms.dto.SignInRequestBody
 import com.suluhulabs.hrms.dto.SignUpRequestBody
 import com.suluhulabs.hrms.dto.VerifyEmailRequestBody
 import com.suluhulabs.hrms.model.User
@@ -64,15 +65,7 @@ class AuthService(
                 </html>
             """.trimIndent()
 
-        try {
-            emailService.sendHtmlEmail(
-                to = signUpRequestBody.email,
-                subject = "HRMS User Email Verification",
-                htmlContent = htmlContent,
-            )
-        } catch (ex: Exception) {
-            throw RuntimeException("Failed to send verification email", ex)
-        }
+        sendVerificationEmail(signUpRequestBody.email, htmlContent)
 
         return "User of email ${signUpRequestBody.email} created successfully. Follow the verification link sent to the provided email to verify your identity"
 
@@ -97,6 +90,60 @@ class AuthService(
 
         return "User of email ${targetUser.email} verified successfully"
 
+    }
+
+    fun signIn(signInRequestBody: SignInRequestBody): Triple<String, String, User> {
+        val targetUser = userRepository.findByEmail(signInRequestBody.email) ?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "User does not exist"
+        )
+
+
+        val isPasswordValid = passwordEncoder.matches(signInRequestBody.password, targetUser.hashedPassword)
+
+        if (!isPasswordValid) throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
+
+        // check if user is verified
+        if (!targetUser.isVerified!!) {
+            val verificationToken = jwtService.generateToken(targetUser.id!!, JwtService.TokenType.VERIFICATION)
+
+            val htmlContent = """
+                <html>
+                  <body>
+                    <p>Hi ${targetUser.firstName},</p>
+                    <p>Before we sign you in, please verify your email address by clicking the link below:</p>
+                    <p><a href="$emailVerificationUrl?verificationToken=$verificationToken">Verify My Email</a></p>
+                    <p>If you did not create an account, you can ignore this email.</p>
+                    <p>Best regards,<br/>The HRMS Team</p>
+                  </body>
+                </html>
+            """.trimIndent()
+
+            sendVerificationEmail(signInRequestBody.email, htmlContent)
+
+
+            throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Email account is not verified. Please verify the email by clicking the verification link sent to the provided email"
+            )
+        }
+
+        val accessToken = jwtService.generateToken(targetUser.id!!, JwtService.TokenType.ACCESS)
+        val refreshToken = jwtService.generateToken(targetUser.id!!, JwtService.TokenType.REFRESH)
+
+        return Triple(accessToken, refreshToken, targetUser)
+    }
+
+    private fun sendVerificationEmail(recipientEmail: String, htmlContent: String) {
+        try {
+            emailService.sendHtmlEmail(
+                to = recipientEmail,
+                subject = "HRMS User Email Verification",
+                htmlContent = htmlContent,
+            )
+        } catch (ex: Exception) {
+            throw RuntimeException("Failed to send verification email", ex)
+        }
     }
 
 }
