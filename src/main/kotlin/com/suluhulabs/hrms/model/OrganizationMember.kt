@@ -1,14 +1,11 @@
 package com.suluhulabs.hrms.model
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
-import jakarta.persistence.UniqueConstraint
+import jakarta.persistence.*
 
 @Entity(name = "organization_members")
-@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "organization_id"])])
+@Table(
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "organization_id"])]
+)
 data class OrganizationMember(
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -17,4 +14,13 @@ data class OrganizationMember(
     @ManyToOne
     @JoinColumn(name = "organization_id", nullable = false)
     val organization: Organization,
-) : BaseEntity()
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+        nullable = false,
+        columnDefinition = "ENUM('ADMIN', 'MEMBER') DEFAULT 'MEMBER'"
+    )
+    var role: MemberRole = MemberRole.MEMBER
+) : BaseEntity() {
+    enum class MemberRole { ADMIN, MEMBER }
+}
