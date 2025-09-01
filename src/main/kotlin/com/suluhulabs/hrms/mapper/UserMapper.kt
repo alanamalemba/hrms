@@ -12,6 +12,7 @@ fun User.toUserDto(): UserDto = UserDto(
     email = this.email,
     isVerified = this.isVerified,
     phoneNumber = this.phoneNumber,
+    profile = this.profile?.toProfileDto(),
     createdAt = this.createdAt,
     updatedAt = this.updatedAt
 )

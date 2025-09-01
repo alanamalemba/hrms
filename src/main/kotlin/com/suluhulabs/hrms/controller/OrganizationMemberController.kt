@@ -1,9 +1,10 @@
 package com.suluhulabs.hrms.controller
 
-import com.suluhulabs.hrms.dto.AddUserToOrganizationRequestDto
+import com.suluhulabs.hrms.dto.AddMemberToOrganizationRequestDto
 import com.suluhulabs.hrms.dto.ResponseBody
-import com.suluhulabs.hrms.dto.UpdateOrganizationUserRequestDto
+import com.suluhulabs.hrms.dto.UpdateOrganizationMemberRequestDto
 import com.suluhulabs.hrms.service.OrganizationMemberService
+import com.suluhulabs.hrms.util.getUserPrincipalFromSecurityContext
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,12 +22,12 @@ class OrganizationMemberController(val organizationMemberService: OrganizationMe
     @PostMapping
     fun addMemberToOrganization(
         @PathVariable organizationId: Long,
-        @Valid @RequestBody addUserToOrganizationRequestDto: AddUserToOrganizationRequestDto
+        @Valid @RequestBody addMemberToOrganizationRequestDto: AddMemberToOrganizationRequestDto
     ): ResponseEntity<ResponseBody<Unit>> {
         organizationMemberService.addUserToOrganization(
             organizationId = organizationId,
-            userId = addUserToOrganizationRequestDto.userId,
-            role = addUserToOrganizationRequestDto.role
+            userId = addMemberToOrganizationRequestDto.userId,
+            role = addMemberToOrganizationRequestDto.role
         )
 
 
@@ -38,9 +39,12 @@ class OrganizationMemberController(val organizationMemberService: OrganizationMe
     fun updateOrganizationMember(
         @PathVariable organizationId: Long,
         @PathVariable userId: Long,
-        @Valid @RequestBody updateOrganizationUserRequestDto: UpdateOrganizationUserRequestDto
+        @Valid @RequestBody updateOrganizationMemberRequestDto: UpdateOrganizationMemberRequestDto
     ): ResponseEntity<ResponseBody<Unit>> {
-        organizationMemberService.updateOrganizationUser(organizationId, userId, updateOrganizationUserRequestDto)
+
+        val principal = getUserPrincipalFromSecurityContext()
+
+        organizationMemberService.updateOrganizationUser(organizationId, userId, updateOrganizationMemberRequestDto, actingUserId= principal.getId())
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseBody(success = true, message = "Organization member updated successfully"))

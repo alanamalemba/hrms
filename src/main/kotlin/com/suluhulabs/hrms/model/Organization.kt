@@ -9,5 +9,9 @@ data class Organization(
     val name: String,
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val memberships: MutableList<OrganizationMember> = mutableListOf()
+    val memberships: MutableList<OrganizationMember> = mutableListOf(),
+
+    @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val jopPostings: MutableList<JobPosting> = mutableListOf()
+
 ) : BaseEntity()

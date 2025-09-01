@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 
 @Entity(name = "users")
 data class User(
@@ -30,6 +31,9 @@ data class User(
     var hashedPassword: String,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val organizationMemberships: MutableList<OrganizationMember> = mutableListOf()
+    val organizationMemberships: MutableList<OrganizationMember> = mutableListOf(),
+
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    val profile: Profile? = null
 
 ) : BaseEntity()

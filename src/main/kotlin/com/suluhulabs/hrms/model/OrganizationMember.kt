@@ -2,7 +2,7 @@ package com.suluhulabs.hrms.model
 
 import jakarta.persistence.*
 
-@Entity(name = "organization_member")
+@Entity(name = "organization_members")
 @Table(
     uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "organization_id"])]
 )
