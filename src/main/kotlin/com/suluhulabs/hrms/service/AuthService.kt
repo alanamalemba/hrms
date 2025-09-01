@@ -1,8 +1,8 @@
 package com.suluhulabs.hrms.service
 
-import com.suluhulabs.hrms.dto.SignInRequestBody
-import com.suluhulabs.hrms.dto.SignUpRequestBody
-import com.suluhulabs.hrms.dto.VerifyEmailRequestBody
+import com.suluhulabs.hrms.dto.SignInRequestDto
+import com.suluhulabs.hrms.dto.SignUpRequestDto
+import com.suluhulabs.hrms.dto.VerifyEmailRequestDto
 import com.suluhulabs.hrms.model.User
 import com.suluhulabs.hrms.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -25,27 +25,27 @@ class AuthService(
 
 
     @Transactional
-    fun signUp(signUpRequestBody: SignUpRequestBody): String {
+    fun signUp(signUpRequestDto: SignUpRequestDto): String {
 
         //check if user exists
-        val existingUser = userRepository.findByEmail(signUpRequestBody.email)
+        val existingUser = userRepository.findByEmail(signUpRequestDto.email)
 
         // throw error if user exists
         if (existingUser != null) throw ResponseStatusException(
             HttpStatus.CONFLICT,
-            "User of email ${signUpRequestBody.email} already exists"
+            "User of email ${signUpRequestDto.email} already exists"
         )
 
         // hash the password and create the new user
-        val hashedPassword = passwordEncoder.encode(signUpRequestBody.password)
+        val hashedPassword = passwordEncoder.encode(signUpRequestDto.password)
 
         val newUser = userRepository.save(
             User(
-                email = signUpRequestBody.email,
-                firstName = signUpRequestBody.firstName,
-                lastName = signUpRequestBody.lastName,
-                otherNames = signUpRequestBody.otherNames,
-                phoneNumber = signUpRequestBody.phoneNumber,
+                email = signUpRequestDto.email,
+                firstName = signUpRequestDto.firstName,
+                lastName = signUpRequestDto.lastName,
+                otherNames = signUpRequestDto.otherNames,
+                phoneNumber = signUpRequestDto.phoneNumber,
                 hashedPassword = hashedPassword,
             )
         )
@@ -56,7 +56,7 @@ class AuthService(
         val htmlContent = """
                 <html>
                   <body>
-                    <p>Hi ${signUpRequestBody.firstName},</p>
+                    <p>Hi ${signUpRequestDto.firstName},</p>
                     <p>Thank you for signing up! Please verify your email address by clicking the link below:</p>
                     <p><a href="$emailVerificationUrl?verificationToken=$verificationToken">Verify My Email</a></p>
                     <p>If you did not create an account, you can ignore this email.</p>
@@ -65,21 +65,21 @@ class AuthService(
                 </html>
             """.trimIndent()
 
-        sendVerificationEmail(signUpRequestBody.email, htmlContent)
+        sendVerificationEmail(signUpRequestDto.email, htmlContent)
 
-        return "User of email ${signUpRequestBody.email} created successfully. Follow the verification link sent to the provided email to verify your identity"
+        return "User of email ${signUpRequestDto.email} created successfully. Follow the verification link sent to the provided email to verify your identity"
 
 
     }
 
-    fun verifyEmail(verifyEmailRequestBody: VerifyEmailRequestBody): String {
+    fun verifyEmail(verifyEmailRequestDto: VerifyEmailRequestDto): String {
         val isTokenValid =
-            jwtService.checkIsTokenValid(verifyEmailRequestBody.verificationToken, JwtService.TokenType.VERIFICATION)
+            jwtService.checkIsTokenValid(verifyEmailRequestDto.verificationToken, JwtService.TokenType.VERIFICATION)
 
         if (!isTokenValid) throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid auth token")
 
         val userId =
-            jwtService.extractUserId(verifyEmailRequestBody.verificationToken, JwtService.TokenType.VERIFICATION)
+            jwtService.extractUserId(verifyEmailRequestDto.verificationToken, JwtService.TokenType.VERIFICATION)
 
         val targetUser = userRepository.findById(userId)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist") }
@@ -92,14 +92,14 @@ class AuthService(
 
     }
 
-    fun signIn(signInRequestBody: SignInRequestBody): Triple<String, String, User> {
-        val targetUser = userRepository.findByEmail(signInRequestBody.email) ?: throw ResponseStatusException(
+    fun signIn(signInRequestDto: SignInRequestDto): Triple<String, String, User> {
+        val targetUser = userRepository.findByEmail(signInRequestDto.email) ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND,
             "User does not exist"
         )
 
 
-        val isPasswordValid = passwordEncoder.matches(signInRequestBody.password, targetUser.hashedPassword)
+        val isPasswordValid = passwordEncoder.matches(signInRequestDto.password, targetUser.hashedPassword)
 
         if (!isPasswordValid) throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
 
@@ -119,7 +119,7 @@ class AuthService(
                 </html>
             """.trimIndent()
 
-            sendVerificationEmail(signInRequestBody.email, htmlContent)
+            sendVerificationEmail(signInRequestDto.email, htmlContent)
 
 
             throw ResponseStatusException(

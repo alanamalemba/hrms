@@ -2,7 +2,7 @@ package com.suluhulabs.hrms.model
 
 import jakarta.persistence.*
 
-@Entity(name = "organization_members")
+@Entity(name = "organization_member")
 @Table(
     uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "organization_id"])]
 )
@@ -20,7 +20,16 @@ data class OrganizationMember(
         nullable = false,
         columnDefinition = "ENUM('ADMIN', 'MEMBER') DEFAULT 'MEMBER'"
     )
-    var role: MemberRole = MemberRole.MEMBER
+    var role: Role = Role.MEMBER,
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+        nullable = false,
+        columnDefinition = "ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE'"
+    )
+    var status: Status = Status.ACTIVE
+
 ) : BaseEntity() {
-    enum class MemberRole { ADMIN, MEMBER }
+    enum class Role { ADMIN, MEMBER }
+    enum class Status { ACTIVE, INACTIVE }
 }
