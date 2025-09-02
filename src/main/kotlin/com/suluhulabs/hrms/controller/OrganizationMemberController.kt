@@ -1,7 +1,7 @@
 package com.suluhulabs.hrms.controller
 
 import com.suluhulabs.hrms.dto.AddMemberToOrganizationRequestDto
-import com.suluhulabs.hrms.dto.ResponseBody
+import com.suluhulabs.hrms.dto.ResponseBodyDto
 import com.suluhulabs.hrms.dto.UpdateOrganizationMemberRequestDto
 import com.suluhulabs.hrms.service.OrganizationMemberService
 import com.suluhulabs.hrms.util.getUserPrincipalFromSecurityContext
@@ -23,7 +23,7 @@ class OrganizationMemberController(val organizationMemberService: OrganizationMe
     fun addMemberToOrganization(
         @PathVariable organizationId: Long,
         @Valid @RequestBody addMemberToOrganizationRequestDto: AddMemberToOrganizationRequestDto
-    ): ResponseEntity<ResponseBody<Unit>> {
+    ): ResponseEntity<ResponseBodyDto<Unit>> {
         organizationMemberService.addUserToOrganization(
             organizationId = organizationId,
             userId = addMemberToOrganizationRequestDto.userId,
@@ -32,7 +32,7 @@ class OrganizationMemberController(val organizationMemberService: OrganizationMe
 
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseBody(success = true, message = "User added to organization successfully"))
+            .body(ResponseBodyDto(success = true, message = "User added to organization successfully"))
     }
 
     @PatchMapping("/{userId}")
@@ -40,14 +40,14 @@ class OrganizationMemberController(val organizationMemberService: OrganizationMe
         @PathVariable organizationId: Long,
         @PathVariable userId: Long,
         @Valid @RequestBody updateOrganizationMemberRequestDto: UpdateOrganizationMemberRequestDto
-    ): ResponseEntity<ResponseBody<Unit>> {
+    ): ResponseEntity<ResponseBodyDto<Unit>> {
 
         val principal = getUserPrincipalFromSecurityContext()
 
         organizationMemberService.updateOrganizationUser(organizationId, userId, updateOrganizationMemberRequestDto, actingUserId= principal.getId())
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseBody(success = true, message = "Organization member updated successfully"))
+            .body(ResponseBodyDto(success = true, message = "Organization member updated successfully"))
     }
 
 

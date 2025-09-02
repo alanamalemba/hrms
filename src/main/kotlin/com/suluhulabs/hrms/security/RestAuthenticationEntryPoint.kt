@@ -1,7 +1,7 @@
 package com.suluhulabs.hrms.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.suluhulabs.hrms.dto.ResponseBody
+import com.suluhulabs.hrms.dto.ResponseBodyDto
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.AuthenticationException
@@ -17,7 +17,7 @@ class RestAuthenticationEntryPoint(private val objectMapper: ObjectMapper) : Aut
     ) {
         response.status = HttpServletResponse.SC_UNAUTHORIZED
         response.contentType = "application/json"
-        val body = ResponseBody<Nothing>(success = false, message = authException.message ?: "Unauthorized")
+        val body = ResponseBodyDto<Nothing>(success = false, message = authException.message ?: "Unauthorized")
         response.writer.write(objectMapper.writeValueAsString(body))
     }
 }

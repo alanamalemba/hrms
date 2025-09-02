@@ -1,6 +1,6 @@
 package com.suluhulabs.hrms.controller
 
-import com.suluhulabs.hrms.dto.ResponseBody
+import com.suluhulabs.hrms.dto.ResponseBodyDto
 import com.suluhulabs.hrms.dto.SignInRequestDto
 import com.suluhulabs.hrms.dto.SignInResponseDto
 import com.suluhulabs.hrms.dto.SignUpRequestDto
@@ -24,11 +24,11 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(val authService: AuthService, @param:Value("\${app.client.url}") val clientUrl: String) {
 
     @PostMapping("/sign-up")
-    fun signUp(@Valid @RequestBody signUpRequestDto: SignUpRequestDto): ResponseEntity<ResponseBody<Unit>> {
+    fun signUp(@Valid @RequestBody signUpRequestDto: SignUpRequestDto): ResponseEntity<ResponseBodyDto<Unit>> {
 
         val successMessage = authService.signUp(signUpRequestDto)
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBody(message = successMessage, success = true))
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBodyDto(message = successMessage, success = true))
 
 
     }
@@ -44,7 +44,7 @@ class AuthController(val authService: AuthService, @param:Value("\${app.client.u
     @PostMapping("/sign-in")
     fun signIn(
         @Valid @RequestBody signInRequestDto: SignInRequestDto, httpServletResponse: HttpServletResponse
-    ): ResponseEntity<ResponseBody<SignInResponseDto>?> {
+    ): ResponseEntity<ResponseBodyDto<SignInResponseDto>?> {
 
         val (accessToken, refreshToken, targetUser) = authService.signIn(signInRequestDto)
 
@@ -57,7 +57,7 @@ class AuthController(val authService: AuthService, @param:Value("\${app.client.u
         httpServletResponse.addCookie(cookie)
 
         return ResponseEntity.ok().body(
-            ResponseBody(
+            ResponseBodyDto(
                 success = true,
                 message = "Logged in successfully",
                 data = SignInResponseDto(user = targetUser.toUserDto(), accessToken = accessToken)

@@ -1,7 +1,7 @@
 package com.suluhulabs.hrms.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.suluhulabs.hrms.dto.ResponseBody
+import com.suluhulabs.hrms.dto.ResponseBodyDto
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.access.AccessDeniedException
@@ -17,7 +17,7 @@ class RestAccessDeniedHandler(private val objectMapper: ObjectMapper) : AccessDe
     ) {
         response.status = HttpServletResponse.SC_FORBIDDEN
         response.contentType = "application/json"
-        val body = ResponseBody<Nothing>(success = false, message = accessDeniedException.message ?: "Forbidden")
+        val body = ResponseBodyDto<Nothing>(success = false, message = accessDeniedException.message ?: "Forbidden")
         response.writer.write(objectMapper.writeValueAsString(body))
     }
 

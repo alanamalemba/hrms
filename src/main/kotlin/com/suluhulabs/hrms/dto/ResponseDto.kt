@@ -1,12 +1,12 @@
 package com.suluhulabs.hrms.dto
 
-data class ResponseBody<T>(
+data class ResponseBodyDto<T>(
     val success: Boolean,
     val message: String,
     val data: T? = null
 )
 
-data class PaginatedResponseBody<T>(
+data class PaginatedResponseBodyDto<T>(
     val success: Boolean,
     val message: String,
     val data: T? = null,
