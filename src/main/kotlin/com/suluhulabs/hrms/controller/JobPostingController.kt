@@ -2,18 +2,18 @@ package com.suluhulabs.hrms.controller
 
 import com.suluhulabs.hrms.dto.CreateJobPostingRequestDto
 import com.suluhulabs.hrms.dto.JobPostingDto
+import com.suluhulabs.hrms.dto.PaginatedResponseBodyDto
 import com.suluhulabs.hrms.dto.ResponseBodyDto
 import com.suluhulabs.hrms.mapper.toJobPostingDto
-import com.suluhulabs.hrms.model.JobPosting
+import com.suluhulabs.hrms.mapper.toPaginatedResponseBodyDto
 import com.suluhulabs.hrms.service.JobPostingService
 import com.suluhulabs.hrms.util.getUserPrincipalFromSecurityContext
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -43,5 +43,21 @@ class JobPostingController(
             )
         )
     }
+
+    @GetMapping("/job-postings")
+    fun getJobPostings(
+        @RequestParam query: String?,
+        @RequestParam organizationId: Long?,
+        @ParameterObject pageable: Pageable
+    ): PaginatedResponseBodyDto<List<JobPostingDto>> {
+
+        val jobPostings = jobPostingService.getJobPostings(query, organizationId, pageable)
+
+        return jobPostings.toPaginatedResponseBodyDto(
+            query = query ?: "",
+            message = "Job postings fetched successfully"
+        ) { it.toJobPostingDto() }
+    }
+
 
 }

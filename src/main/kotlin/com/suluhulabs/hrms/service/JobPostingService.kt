@@ -6,6 +6,8 @@ import com.suluhulabs.hrms.model.OrganizationMember
 import com.suluhulabs.hrms.repository.JobPostingRepository
 import com.suluhulabs.hrms.repository.OrganizationMemberRepository
 import com.suluhulabs.hrms.repository.OrganizationRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -43,7 +45,7 @@ class JobPostingService(
         }
 
 
-    return jobPostingRepository.save(
+        return jobPostingRepository.save(
             JobPosting(
                 title = createJobPostingRequestDto.title,
                 description = createJobPostingRequestDto.description,
@@ -52,6 +54,15 @@ class JobPostingService(
         )
 
 
+    }
+
+    fun getJobPostings(
+        query: String?,
+        organizationId: Long?,
+        pageable: Pageable
+    ): Page<JobPosting> {
+
+        return jobPostingRepository.findJobPostings(query ,organizationId, pageable)
     }
 
 }

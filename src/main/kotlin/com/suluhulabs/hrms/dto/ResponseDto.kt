@@ -16,7 +16,7 @@ data class PaginatedResponseBodyDto<T>(
         val page: Int,
         val size: Int,
         val query: String,
-        val totalRecords: Int,
+        val totalElements: Int,
         val totalPages: Int
     )
 }
