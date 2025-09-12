@@ -1,6 +1,7 @@
 package com.suluhulabs.hrms.service
 
 import com.suluhulabs.hrms.dto.CreateJobPostRequestDto
+import com.suluhulabs.hrms.exception.NotFoundException
 import com.suluhulabs.hrms.model.JobPost
 import com.suluhulabs.hrms.model.OrganizationMember
 import com.suluhulabs.hrms.repository.JobPostRepository
@@ -62,7 +63,11 @@ class JobPostService(
         pageable: Pageable
     ): Page<JobPost> {
 
-        return jobPostRepository.findJobPosts(query ,organizationId, pageable)
+        return jobPostRepository.findJobPosts(query, organizationId, pageable)
+    }
+
+    fun getJobPostById(jobPostId: Long): JobPost {
+        return jobPostRepository.findById(jobPostId).orElseThrow { NotFoundException("Job post not found!") }
     }
 
 }

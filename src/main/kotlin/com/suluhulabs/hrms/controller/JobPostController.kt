@@ -59,5 +59,18 @@ class JobPostController(
         ) { it.toJobPostDto() }
     }
 
+    @GetMapping("/job-posts/{jobPostId}")
+    fun getJobPostById(@PathVariable jobPostId: Long): ResponseEntity<ResponseBodyDto<JobPostDto>?> {
+        val jobPost = jobPostService.getJobPostById(jobPostId)
+
+        return ResponseEntity.ok().body(
+            ResponseBodyDto(
+                success = true,
+                message = "Job post found successfully",
+                data = jobPost.toJobPostDto()
+            )
+        )
+    }
+
 
 }
