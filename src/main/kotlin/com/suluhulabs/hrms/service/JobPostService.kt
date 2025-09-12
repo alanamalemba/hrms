@@ -1,9 +1,9 @@
 package com.suluhulabs.hrms.service
 
-import com.suluhulabs.hrms.dto.CreateJobPostingRequestDto
-import com.suluhulabs.hrms.model.JobPosting
+import com.suluhulabs.hrms.dto.CreateJobPostRequestDto
+import com.suluhulabs.hrms.model.JobPost
 import com.suluhulabs.hrms.model.OrganizationMember
-import com.suluhulabs.hrms.repository.JobPostingRepository
+import com.suluhulabs.hrms.repository.JobPostRepository
 import com.suluhulabs.hrms.repository.OrganizationMemberRepository
 import com.suluhulabs.hrms.repository.OrganizationRepository
 import org.springframework.data.domain.Page
@@ -13,17 +13,17 @@ import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
 @Service
-class JobPostingService(
+class JobPostService(
     val organizationMemberRepository: OrganizationMemberRepository,
-    val jobPostingRepository: JobPostingRepository,
+    val jobPostRepository: JobPostRepository,
     val organizationRepository: OrganizationRepository
 ) {
 
-    fun createJobPosting(
+    fun createJobPost(
         actingUserId: Long,
-        createJobPostingRequestDto: CreateJobPostingRequestDto,
+        createJobPostRequestDto: CreateJobPostRequestDto,
         organizationId: Long
-    ): JobPosting {
+    ): JobPost {
 
         val actingMember = organizationMemberRepository.findByOrganizationIdAndUserId(
             organizationId = organizationId,
@@ -45,10 +45,10 @@ class JobPostingService(
         }
 
 
-        return jobPostingRepository.save(
-            JobPosting(
-                title = createJobPostingRequestDto.title,
-                description = createJobPostingRequestDto.description,
+        return jobPostRepository.save(
+            JobPost(
+                title = createJobPostRequestDto.title,
+                description = createJobPostRequestDto.description,
                 organization = targetOrganization,
             )
         )
@@ -56,13 +56,13 @@ class JobPostingService(
 
     }
 
-    fun getJobPostings(
+    fun getJobPosts(
         query: String?,
         organizationId: Long?,
         pageable: Pageable
-    ): Page<JobPosting> {
+    ): Page<JobPost> {
 
-        return jobPostingRepository.findJobPostings(query ,organizationId, pageable)
+        return jobPostRepository.findJobPosts(query ,organizationId, pageable)
     }
 
 }

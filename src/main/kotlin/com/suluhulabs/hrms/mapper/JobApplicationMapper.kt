@@ -6,7 +6,7 @@ import com.suluhulabs.hrms.model.JobApplication
 fun JobApplication.toDto(): JobApplicationDto = JobApplicationDto(
     id = this.id,
     user = this.user.toUserDto(),
-    jobPosting = this.jobPosting.toJobPostingDto(),
+    jobPost = this.jobPost.toJobPostDto(),
     createdAt = this.createdAt,
     updatedAt = this.updatedAt,
     status = this.status

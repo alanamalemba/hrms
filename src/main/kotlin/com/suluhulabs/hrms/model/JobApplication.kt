@@ -3,15 +3,15 @@ package com.suluhulabs.hrms.model
 import jakarta.persistence.*
 
 @Entity(name = "job_applications")
-@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "job_posting_id"])])
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "job_post_id"])])
 data class JobApplication(
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
 
     @ManyToOne
-    @JoinColumn(name = "job_posting_id", nullable = false)
-    val jobPosting: JobPosting,
+    @JoinColumn(name = "job_post_id", nullable = false)
+    val jobPost: JobPost,
 
     @Enumerated(EnumType.STRING)
     @Column(

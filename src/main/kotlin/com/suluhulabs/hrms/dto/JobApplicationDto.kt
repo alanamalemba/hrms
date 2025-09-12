@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class JobApplicationDto (
     val id:Long?,
     val user: UserDto,
-    val jobPosting: JobPostingDto,
+    val jobPost: JobPostDto,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?,
     val status: JobApplication.Status

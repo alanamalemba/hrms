@@ -1,12 +1,12 @@
 package com.suluhulabs.hrms.controller
 
-import com.suluhulabs.hrms.dto.CreateJobPostingRequestDto
-import com.suluhulabs.hrms.dto.JobPostingDto
+import com.suluhulabs.hrms.dto.CreateJobPostRequestDto
+import com.suluhulabs.hrms.dto.JobPostDto
 import com.suluhulabs.hrms.dto.PaginatedResponseBodyDto
 import com.suluhulabs.hrms.dto.ResponseBodyDto
-import com.suluhulabs.hrms.mapper.toJobPostingDto
+import com.suluhulabs.hrms.mapper.toJobPostDto
 import com.suluhulabs.hrms.mapper.toPaginatedResponseBodyDto
-import com.suluhulabs.hrms.service.JobPostingService
+import com.suluhulabs.hrms.service.JobPostService
 import com.suluhulabs.hrms.util.getUserPrincipalFromSecurityContext
 import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
@@ -17,46 +17,46 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
-class JobPostingController(
-    val jobPostingService: JobPostingService
+class JobPostController(
+    val jobPostService: JobPostService
 ) {
 
-    @PostMapping("/organizations/{organizationId}/job-postings")
+    @PostMapping("/organizations/{organizationId}/job-posts")
     fun createOrganizationJobPositing(
         @PathVariable organizationId: Long,
-        @Valid @RequestBody createJobPostingRequestDto: CreateJobPostingRequestDto
-    ): ResponseEntity<ResponseBodyDto<JobPostingDto>?> {
+        @Valid @RequestBody createJobPostRequestDto: CreateJobPostRequestDto
+    ): ResponseEntity<ResponseBodyDto<JobPostDto>?> {
 
         val principal = getUserPrincipalFromSecurityContext()
 
-        val newJobPosting = jobPostingService.createJobPosting(
+        val newJobPost = jobPostService.createJobPost(
             actingUserId = principal.getId(),
             organizationId = organizationId,
-            createJobPostingRequestDto = createJobPostingRequestDto
+            createJobPostRequestDto = createJobPostRequestDto
         )
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
             ResponseBodyDto(
                 success = true,
-                data = newJobPosting.toJobPostingDto(),
+                data = newJobPost.toJobPostDto(),
                 message = "Job posting created successfully"
             )
         )
     }
 
-    @GetMapping("/job-postings")
-    fun getJobPostings(
+    @GetMapping("/job-posts")
+    fun getJobPosts(
         @RequestParam query: String?,
         @RequestParam organizationId: Long?,
         @ParameterObject pageable: Pageable
-    ): PaginatedResponseBodyDto<List<JobPostingDto>> {
+    ): PaginatedResponseBodyDto<List<JobPostDto>> {
 
-        val jobPostings = jobPostingService.getJobPostings(query, organizationId, pageable)
+        val jobPostsPage = jobPostService.getJobPosts(query, organizationId, pageable)
 
-        return jobPostings.toPaginatedResponseBodyDto(
+        return jobPostsPage.toPaginatedResponseBodyDto(
             query = query ?: "",
             message = "Job postings fetched successfully"
-        ) { it.toJobPostingDto() }
+        ) { it.toJobPostDto() }
     }
 
 

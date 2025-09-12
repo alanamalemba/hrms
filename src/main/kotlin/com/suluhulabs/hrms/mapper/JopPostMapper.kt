@@ -1,9 +1,9 @@
 package com.suluhulabs.hrms.mapper
 
-import com.suluhulabs.hrms.dto.JobPostingDto
-import com.suluhulabs.hrms.model.JobPosting
+import com.suluhulabs.hrms.dto.JobPostDto
+import com.suluhulabs.hrms.model.JobPost
 
-fun JobPosting.toJobPostingDto(): JobPostingDto = JobPostingDto(
+fun JobPost.toJobPostDto(): JobPostDto = JobPostDto(
     id = this.id,
     title = this.title,
     description = this.description,

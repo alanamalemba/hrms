@@ -12,6 +12,6 @@ data class Organization(
     val memberships: MutableList<OrganizationMember> = mutableListOf(),
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val jopPostings: MutableList<JobPosting> = mutableListOf()
+    val jopPosts: MutableList<JobPost> = mutableListOf()
 
 ) : BaseEntity()

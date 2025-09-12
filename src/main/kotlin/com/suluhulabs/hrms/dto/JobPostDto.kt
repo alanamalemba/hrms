@@ -2,7 +2,7 @@ package com.suluhulabs.hrms.dto
 
 import java.time.LocalDateTime
 
-data class JobPostingDto(
+data class JobPostDto(
     val id: Long? = null,
     val title: String,
     val description: String,

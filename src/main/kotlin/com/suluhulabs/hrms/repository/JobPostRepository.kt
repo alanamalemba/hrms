@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
-interface JobPostingRepository : JpaRepository<JobPost, Long> {
+interface JobPostRepository : JpaRepository<JobPost, Long> {
 
     @Query("""
         SELECT jp
