@@ -31,4 +31,9 @@ class JobApplicationService(
         return jobApplicationRepository.findByJobPostId(jobPostId, pageable)
 
     }
+
+    fun getJobApplicationById(jobApplicationId: Long): JobApplication {
+        return jobApplicationRepository.findById(jobApplicationId)
+            .orElseThrow { NotFoundException("Job Application not found!") }
+    }
 }

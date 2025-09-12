@@ -9,7 +9,7 @@ data class Organization(
     val name: String,
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val memberships: MutableList<OrganizationMember> = mutableListOf(),
+    val members: MutableList<OrganizationMember> = mutableListOf(),
 
     @OneToMany(mappedBy = "organization", cascade = [CascadeType.ALL], orphanRemoval = true)
     val jopPosts: MutableList<JobPost> = mutableListOf()

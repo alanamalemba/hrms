@@ -46,9 +46,30 @@ class JobApplicationController(val jobApplicationService: JobApplicationService)
 
         val jobApplicationsPage = jobApplicationService.getJobApplicationsByJobPostId(jobPostId, pageable)
 
-        return jobApplicationsPage.toPaginatedResponseBodyDto(success = true, message = "Jop posts") {
+        return jobApplicationsPage.toPaginatedResponseBodyDto(
+            success = true,
+            message = "Jop posts found successfully"
+        ) {
             it.toDto()
         }
+
+    }
+
+    @GetMapping("/job-applications/{jobApplicationId}")
+    fun getJobApplicationById(
+        @PathVariable jobApplicationId: Long,
+    ): ResponseEntity<ResponseBodyDto<JobApplicationDto>?> {
+
+        val jobApplication = jobApplicationService.getJobApplicationById(jobApplicationId)
+
+        return ResponseEntity.ok().body(
+            ResponseBodyDto(
+                success = true,
+                message = "Job post found successfully",
+                data = jobApplication.toDto()
+            )
+        )
+
 
     }
 

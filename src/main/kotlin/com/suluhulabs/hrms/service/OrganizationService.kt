@@ -15,11 +15,13 @@ class OrganizationService(
     val userRepository: UserRepository
 ) {
     @Transactional
-    fun createOrganization(createOrganizationRequestDto: CreateOrganizationRequestDto, principalId: Long) {
+    fun createOrganization(createOrganizationRequestDto: CreateOrganizationRequestDto, principalId: Long): Organization {
 
 
         val newOrganization = organizationRepository.save(Organization(name = createOrganizationRequestDto.name))
 
         organizationMemberService.addUserToOrganization(principalId, newOrganization.id!!, OrganizationMember.Role.ADMIN)
+
+        return newOrganization
     }
 }
