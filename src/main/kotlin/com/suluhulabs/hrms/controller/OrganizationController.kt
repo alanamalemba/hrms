@@ -9,9 +9,7 @@ import com.suluhulabs.hrms.util.getUserPrincipalFromSecurityContext
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class OrganizationController(val organizationService: OrganizationService) {
@@ -26,6 +24,19 @@ class OrganizationController(val organizationService: OrganizationService) {
                 success = true,
                 message = "Organization created successfully",
                 data = newOrganization.toDto()
+            )
+        )
+    }
+
+    @GetMapping("/organizations/{organizationId}")
+    fun getOrganizationById(@PathVariable organizationId: Long): ResponseEntity<ResponseBodyDto<OrganizationDto>?> {
+        val organization = organizationService.getOrganizationById(organizationId)
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ResponseBodyDto(
+                success = true,
+                message = "Organization found successfully",
+                data = organization.toDto()
             )
         )
     }
